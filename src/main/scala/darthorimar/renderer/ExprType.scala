@@ -19,8 +19,3 @@ case class StrType(v: String) extends ExprType {
   override def show: String = v
   override def typeName: String = "String"
 }
-
-case class ErrorType(message: String) extends ExprType {
-  override def show: String = message
-  override def typeName: String = "Error"
-}
