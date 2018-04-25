@@ -4,6 +4,7 @@ import java.time.LocalDateTime
 
 import fastparse.all._
 import darthorimar.ast._
+import darthorimar.functions.Functions
 import darthorimar.parser.ParserCommon.date
 import darthorimar.renderer.DateType
 
@@ -19,8 +20,17 @@ object ExpressionParser {
   }
 
   private val parens: P[Expression] = P("(" ~ baseExpr ~ ")")
+
+  private val funcCall =
+    P(variable ~ "(" ~ baseExpr.rep(sep=",") ~")") filter { case (name, _) =>
+        Functions.functionNames contains name
+    } map {case(name, args) =>
+        FuncCall(name, args)
+    }
+
   private val atom: P[Expression] =
-    P(date.map(Date) |
+    P(funcCall |
+      date.map(Date) |
       variable.map(VarRef) |
       number.map(Number) |
       string.map(Str) |

@@ -27,7 +27,7 @@ object ParserCommon {
   val string: P[String] =
     P("\"" ~ CharsWhile(_ != '"').! ~ "\"")
   val variable: P[String] =
-    P((CharPred(_.isLetter) ~ CharsWhile(_.isLetterOrDigit).rep).!
+    P((CharPred(_.isLower) ~ CharsWhile(_.isLetterOrDigit).rep).!
       .filter(!keywords.contains(_)))
   var date: P[LocalDateTime] =
     P("Date(" ~ CharsWhile(_ != ')').! ~ ")").filter { d =>

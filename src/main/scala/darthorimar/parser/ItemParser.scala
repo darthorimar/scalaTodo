@@ -16,7 +16,7 @@ class ItemParser(indent: Int) {
 
   private val funcDefBlock =
     P(funcDefItem ~ blockBody) map { case (name, args, body) =>
-      FuncDef(name, args, body)
+      DefItem(name, args, body)
     }
 
   private val definitions =

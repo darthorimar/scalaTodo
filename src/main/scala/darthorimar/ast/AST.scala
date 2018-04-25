@@ -4,7 +4,7 @@ import java.time.LocalDateTime
 
 sealed trait AST
 
-case class Template(defs: Seq[Def], items: Seq[Item]) extends AST
+case class Template(defs: Seq[MetaItem], items: Seq[Item]) extends AST
 
 sealed trait ItemEntry extends AST
 case class ExpressionEntry(expr: Expression) extends ItemEntry
@@ -23,8 +23,9 @@ case class Str(value: String) extends Expression
 case class BoolConst(value: Boolean) extends Expression
 case class Date(value: LocalDateTime) extends Expression
 case class VarRef(name: String) extends Expression
+case class FuncCall(name: String, args: Seq[Expression]) extends Expression
 
-sealed trait Def extends Item {
+sealed trait MetaItem extends Item {
   def name: String
 }
-case class FuncDef(name: String, args: Seq[String], body: Seq[Item]) extends Def
+case class DefItem(name: String, args: Seq[String], body: Seq[Item]) extends MetaItem

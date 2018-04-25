@@ -1,6 +1,7 @@
 package darthorimar.renderer
 
 import darthorimar.ast._
+import darthorimar.functions.Functions
 import darthorimar.parser.ItemParser
 
 class Renderer(conf: RenderConfig) {
@@ -23,6 +24,12 @@ class Renderer(conf: RenderConfig) {
             case Some(v) => Right(v)
             case None    => Left(s"Variable $x not found")
           }
+      }
+    case FuncCall(name, args) =>
+      args.map(evalExpr(_)(localVars)).sequence match {
+        case Right(rs) =>
+          Functions.callFunction(name, rs)
+        case Left(message) => Left(message)
       }
     case BinOp(op, left, right) =>
       val leftExpr = evalExpr(left)
@@ -90,7 +97,7 @@ class Renderer(conf: RenderConfig) {
       }
     case FuncDefItem(name, args) =>
       state.defs.get(name) match {
-        case Some(d: FuncDef) =>
+        case Some(d: DefItem) =>
           if (args.length == d.args.length) {
             args.map(evalExpr(_)(state.localVars)).sequence match {
               case Right(rs) =>
@@ -106,7 +113,7 @@ class Renderer(conf: RenderConfig) {
 }
 object Renderer {
   type Result[+T] = Either[String, T]
-  case class State(defs: Map[String, Def], localVars: Map[String, ExprType])
+  case class State(defs: Map[String, MetaItem], localVars: Map[String, ExprType])
 
   def apply(conf: RenderConfig): Renderer = new Renderer(conf)
 }

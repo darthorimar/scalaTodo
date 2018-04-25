@@ -6,7 +6,7 @@ object VariableFinder {
   private def getVariables(tree: AST)(implicit ignore: Seq[String] = Seq.empty): Seq[String] = tree match {
     case Template(defs, items) => 
       defs.flatMap(getVariables) ++ items.flatMap(getVariables)
-    case FuncDef(_, args, body) =>
+    case DefItem(_, args, body) =>
       body.flatMap(getVariables(_)(ignore ++ args))
     case SimpleItem(value, subItems) =>
       value.flatMap(getVariables )++ subItems.flatMap(getVariables)
@@ -21,6 +21,8 @@ object VariableFinder {
       if (ignore.contains(name)) Seq.empty
       else Seq(name)
     case FuncDefItem(_, args) =>
+      args.flatMap(getVariables)
+    case FuncCall(_, args) =>
       args.flatMap(getVariables)
   }
   def listVariables(template: Template): Seq[String] =

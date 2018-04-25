@@ -2,7 +2,7 @@ package darthorimar
 
 import java.io.File
 
-import darthorimar.ast.{FuncDef, Template}
+import darthorimar.ast.{DefItem, Template}
 import darthorimar.parser.{ConfigParser, ItemParser}
 import darthorimar.renderer.{ExprType, RenderConfig, Renderer}
 
