@@ -1,41 +1,69 @@
 package darthorimar.functions
 
+import java.nio.charset.{Charset, StandardCharsets}
 import java.time.format.DateTimeFormatter
 
 import darthorimar.renderer.{DateType, ExprType, IntType, StrType}
 
+import scala.io.Codec
+import scala.util.{Random, Try}
+import scala.xml.XML
+
 object Functions {
-  private val functions: Map[String, PartialFunction[List[ExprType], ExprType]] =
+  private val functions: Map[String, PartialFunction[List[ExprType], Either[String, ExprType]]] =
     Map(
       "date" -> {
-        case DateType(d)::Nil => StrType(d.format(DateTimeFormatter.ISO_LOCAL_DATE))
+        case DateType(d)::Nil => Right(StrType(d.format(DateTimeFormatter.ISO_LOCAL_DATE)))
       },
       "time" -> {
-        case DateType(d)::Nil => StrType(d.format(DateTimeFormatter.ISO_LOCAL_TIME))
+        case DateType(d)::Nil => Right(StrType(d.format(DateTimeFormatter.ISO_LOCAL_TIME)))
       },
       "dateTime" -> {
-        case DateType(d)::Nil => StrType(d.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
+        case DateType(d)::Nil => Right(StrType(d.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)))
       },
       "seconds" -> {
-        case DateType(d)::Nil => IntType(d.getSecond)
+        case DateType(d)::Nil => Right(IntType(d.getSecond))
       },
       "minutes" -> {
-        case DateType(d)::Nil => IntType(d.getMinute)
+        case DateType(d)::Nil => Right(IntType(d.getMinute))
       },
       "hours" -> {
-        case DateType(d)::Nil => IntType(d.getHour)
+        case DateType(d)::Nil => Right(IntType(d.getHour))
       },
       "day" -> {
-        case DateType(d)::Nil => IntType(d.getDayOfMonth)
+        case DateType(d)::Nil => Right(IntType(d.getDayOfMonth))
       },
       "month" -> {
-        case DateType(d)::Nil => IntType(d.getMonthValue)
+        case DateType(d)::Nil => Right(IntType(d.getMonthValue))
       },
       "monthName" -> {
-        case DateType(d)::Nil => StrType(d.getMonth.name)
+        case DateType(d)::Nil => Right(StrType(d.getMonth.name))
       },
       "year" -> {
-        case DateType(d)::Nil => IntType(d.getYear)
+        case DateType(d)::Nil => Right(IntType(d.getYear))
+      },
+      "bash" -> {
+        case Nil =>
+          val codec = new Codec(Charset.forName("windows-1251"))
+          val qs =
+            for {
+              rss <- Try(scala.io.Source.fromURL("https://bash.im/rss/")(codec))
+                        .map(_.getLines().mkString)
+              xml <- Try(XML.loadString(rss))
+              quotes =
+              (xml \\ "channel" \ "item" \ "description")
+                .map(_.text)
+                .map { q =>
+                  q.replace("&lt", "<")
+                    .replace("&gt", ">")
+                    .replace("<br>", "\n")
+                }
+            } yield quotes
+
+          qs.toEither.left.map(_.toString)
+            .map { q =>
+              StrType(q(Random.nextInt(q.length)))
+            }
       }
     )
   def functionNames: Seq[String] = functions.keys.toSeq
@@ -44,7 +72,7 @@ object Functions {
     functions.get(name) match {
       case Some(f) =>
         if (f.isDefinedAt(args.toList))
-          Right(f(args.toList))
+          f(args.toList)
         else
           Left(s"Bad arguments for functions $name")
       case None =>

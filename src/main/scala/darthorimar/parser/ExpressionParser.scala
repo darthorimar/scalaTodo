@@ -25,7 +25,7 @@ object ExpressionParser {
     P(variable ~ "(" ~ baseExpr.rep(sep=",") ~")") filter { case (name, _) =>
       !keywords.contains(name)
     } map {case(name, args) =>
-        FuncCall(name, args)
+      FuncCall(name, args)
     }
 
   private val atom: P[Expression] =
