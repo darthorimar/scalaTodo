@@ -1,5 +1,7 @@
 package darthorimar.ast
 
+import java.time.LocalDateTime
+
 sealed trait AST
 
 case class Template(defs: Seq[Def], items: Seq[Item]) extends AST
@@ -19,6 +21,7 @@ case class BinOp(op: String, left: Expression, right: Expression) extends Expres
 case class Number(num: Int) extends Expression
 case class Str(value: String) extends Expression
 case class BoolConst(value: Boolean) extends Expression
+case class Date(value: LocalDateTime) extends Expression
 case class VarRef(name: String) extends Expression
 
 sealed trait Def extends Item {

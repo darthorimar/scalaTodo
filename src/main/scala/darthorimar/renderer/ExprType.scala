@@ -1,5 +1,8 @@
 package darthorimar.renderer
 
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+
 sealed trait ExprType {
   def show: String
   def typeName: String
@@ -18,4 +21,9 @@ case class BoolType(v: Boolean) extends ExprType {
 case class StrType(v: String) extends ExprType {
   override def show: String = v
   override def typeName: String = "String"
+}
+
+case class DateType(v: LocalDateTime) extends ExprType {
+  override def show: String = v.format(DateTimeFormatter.ISO_DATE_TIME)
+  override def typeName: String = "Date"
 }

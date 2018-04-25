@@ -16,7 +16,7 @@ object VariableFinder {
     case TextEntry(_) => Seq.empty
     case BinOp(_, left, right) =>
       getVariables(left) ++ getVariables(right)
-    case _@(Number(_) | Str(_) | BoolConst(_)) => Seq.empty
+    case _@(Number(_) | Str(_) | BoolConst(_) | Date(_)) => Seq.empty
     case VarRef(name) =>
       if (ignore.contains(name)) Seq.empty
       else Seq(name)

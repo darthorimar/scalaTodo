@@ -11,9 +11,10 @@ class Renderer(conf: RenderConfig) {
 
 
   private def evalExpr(expr: Expression)(implicit localVars: Map[String, ExprType]): Result[ExprType] = expr match {
-    case Number(x) => Right(IntType(x))
+    case Number(x) =>    Right(IntType(x))
     case BoolConst(x) => Right(BoolType(x))
-    case Str(x) => Right(StrType(x))
+    case Str(x) =>       Right(StrType(x))
+    case Date(x) =>      Right(DateType(x))
     case VarRef(x) =>
       localVars.get(x) match {
         case Some(v) => Right(v)
@@ -47,6 +48,9 @@ class Renderer(conf: RenderConfig) {
         case (Right(StrType(l)), "+", Right(StrType(r)))  => Right(StrType(l + r))
         case (Right(StrType(l)), "=", Right(StrType(r)))  => Right(BoolType(l == r))
         case (Right(StrType(l)), "!=", Right(StrType(r))) => Right(BoolType(l != r))
+
+        case (Right(DateType(l)), "=", Right(DateType(r))) => Right(BoolType(l == r))
+        case (Right(DateType(l)), "!=", Right(DateType(r))) => Right(BoolType(l != r))
 
         case (Left(msg1), _, Left(msg2)) => Left(s"$msg1, $msg2")
         case (_, _, Left(msg)) => Left(msg)

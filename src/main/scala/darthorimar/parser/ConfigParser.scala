@@ -1,19 +1,23 @@
 package darthorimar.parser
 
-import darthorimar.renderer.{BoolType, ExprType, IntType, RenderConfig, StrType}
+import java.time.{LocalDate, LocalDateTime}
+
+import darthorimar.renderer._
 import fastparse.all._
 import fastparse.core
 
 object ConfigParser {
   import ParserCommon._
+
   private val value =
     P(number.map(IntType) |
       string.map(StrType) |
-      boolConst.map(BoolType))
+      boolConst.map(BoolType) |
+      date.map(DateType))
   private val entry =
     P(variable ~ "=" ~ value)
   private val parser: P[Map[String, ExprType]] =
-    P(entry.rep(sep="\n")).map(Map(_:_*))
+    P(entry.rep(sep = "\n")).map(Map(_: _*))
 
   def parse(conf: String): Either[String, RenderConfig] =
     parser.parse(conf).toEither.map(RenderConfig)

@@ -1,7 +1,11 @@
 package darthorimar.parser
 
+import java.time.LocalDateTime
+
 import fastparse.all._
 import darthorimar.ast._
+import darthorimar.parser.ParserCommon.date
+import darthorimar.renderer.DateType
 
 object ExpressionParser {
   import White._
@@ -16,7 +20,8 @@ object ExpressionParser {
 
   private val parens: P[Expression] = P("(" ~ baseExpr ~ ")")
   private val atom: P[Expression] =
-    P(variable.map(VarRef) |
+    P(date.map(Date) |
+      variable.map(VarRef) |
       number.map(Number) |
       string.map(Str) |
       boolConst.map(BoolConst) |
