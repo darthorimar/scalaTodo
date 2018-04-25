@@ -1,12 +1,41 @@
 package darthorimar.functions
 
-import darthorimar.renderer.{ExprType, IntType}
+import java.time.format.DateTimeFormatter
+
+import darthorimar.renderer.{DateType, ExprType, IntType, StrType}
 
 object Functions {
   private val functions: Map[String, PartialFunction[List[ExprType], ExprType]] =
     Map(
-      "abs" -> {
-        case IntType(i)::Nil => IntType(math.abs(i))
+      "date" -> {
+        case DateType(d)::Nil => StrType(d.format(DateTimeFormatter.ISO_LOCAL_DATE))
+      },
+      "time" -> {
+        case DateType(d)::Nil => StrType(d.format(DateTimeFormatter.ISO_LOCAL_TIME))
+      },
+      "dateTime" -> {
+        case DateType(d)::Nil => StrType(d.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
+      },
+      "seconds" -> {
+        case DateType(d)::Nil => IntType(d.getSecond)
+      },
+      "minutes" -> {
+        case DateType(d)::Nil => IntType(d.getMinute)
+      },
+      "hours" -> {
+        case DateType(d)::Nil => IntType(d.getHour)
+      },
+      "day" -> {
+        case DateType(d)::Nil => IntType(d.getDayOfMonth)
+      },
+      "month" -> {
+        case DateType(d)::Nil => IntType(d.getMonthValue)
+      },
+      "monthName" -> {
+        case DateType(d)::Nil => StrType(d.getMonth.name)
+      },
+      "year" -> {
+        case DateType(d)::Nil => IntType(d.getYear)
       }
     )
   def functionNames: Seq[String] = functions.keys.toSeq
