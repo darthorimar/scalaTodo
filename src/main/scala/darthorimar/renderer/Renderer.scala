@@ -15,9 +15,13 @@ class Renderer(conf: RenderConfig) {
     case BoolConst(x) => Right(BoolType(x))
     case Str(x) => Right(StrType(x))
     case VarRef(x) =>
-      (conf.variables ++ localVars).get(x) match {
+      localVars.get(x) match {
         case Some(v) => Right(v)
-        case None    => Left(s"Variable $x not found")
+        case None =>
+          conf.variables.get(x) match {
+            case Some(v) => Right(v)
+            case None    => Left(s"Variable $x not found")
+          }
       }
     case BinOp(op, left, right) =>
       val leftExpr = evalExpr(left)

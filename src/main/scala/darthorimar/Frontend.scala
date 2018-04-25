@@ -2,6 +2,7 @@ package darthorimar
 
 import java.io.File
 
+import darthorimar.ast.{FuncDef, Template}
 import darthorimar.parser.{ConfigParser, ItemParser}
 import darthorimar.renderer.{ExprType, RenderConfig, Renderer}
 
@@ -53,6 +54,7 @@ class Frontend(templateFile: File, configFileOpt: Option[File]) {
         interactiveConfig(newConfig, (vars.toSet -- newVars.keys).toSeq)
     }
   }
+
 
   def render: Either[String, String] =
     for {
