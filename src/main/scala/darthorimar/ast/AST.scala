@@ -14,6 +14,7 @@ case class SimpleItem(value: Seq[ItemEntry], subItems: Seq[Item] = Seq.empty)
   extends Item
 
 case class IfItem(expr: Expression, ifBody: Seq[Item], elseBody: Seq[Item]) extends Item
+case class LoopItem(loopVar: String, range: Expression, body: Seq[Item]) extends Item
 case class FuncDefItem(name: String, args: Seq[Expression]) extends Item
 
 sealed trait Expression extends AST

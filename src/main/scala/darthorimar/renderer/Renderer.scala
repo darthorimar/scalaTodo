@@ -4,6 +4,8 @@ import darthorimar.ast._
 import darthorimar.functions.Functions
 import darthorimar.parser.ItemParser
 
+import scala.language.postfixOps
+
 class Renderer(conf: RenderConfig) {
   import Renderer._
 
@@ -114,6 +116,19 @@ class Renderer(conf: RenderConfig) {
           } else Left(s"Wrong number of arguments for definition $name")
         case None =>
           Left(s"Definition $name not found")
+      }
+    case LoopItem(loopVar, range, body) =>
+      evalExpr(range)(state.localVars) match {
+        case Right(SeqType(r)) =>
+          val items =
+            r map { i =>
+              val newState = state.copy(localVars = state.localVars + (loopVar -> i))
+              renderItems(body, indent)(newState)
+            } sequence
+
+        items.map(_.mkString)
+        case Right(_) => Left("Loop range shoulbd be Seq")
+        case Left(message) => Left(message)
       }
   }
 }

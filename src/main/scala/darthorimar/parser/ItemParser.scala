@@ -34,6 +34,9 @@ class ItemParser(indent: Int) {
     P("%def" ~ " ".rep(min = 1) ~ variable ~ " ".rep ~ expressionEntry.rep(sep = " ")) map { case (name, args) =>
       FuncDefItem(name, args.map(_.expr))
     }
+  private val loopItem =
+    P("%loop" ~ " ".rep(min = 1) ~ variable ~ " ".rep ~ "<-" ~ " ".rep ~ expression)
+
   private val itemValue = P((textEntry | expressionEntry).rep(min = 1))
 
   val deeper: P[Int] = P(" ".rep(indent + 1).!.map(_.length))
@@ -54,8 +57,12 @@ class ItemParser(indent: Int) {
     IfItem(cond, ifItems, elseItems.toSeq.flatten)
   }
 
+  private val forBlock = loopItem ~ blockBody map { case (loopVar, range, body) =>
+    LoopItem(loopVar, range, body)
+  }
+
   private val item: P[Item] =
-    P(block | ifElseBlock | itemValue.map(SimpleItem(_)) | defItem)
+    P(block | ifElseBlock | forBlock | itemValue.map(SimpleItem(_)) | defItem)
 
   private val template: P[Template] =
     P((definitions ~ "\n").? ~ item.rep(sep = "\n") ~ End).map { case (defs, items) =>

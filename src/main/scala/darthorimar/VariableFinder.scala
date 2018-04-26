@@ -26,6 +26,8 @@ object VariableFinder {
       args.flatMap(getVariables)
     case SeqVal(value) =>
       value.flatMap(getVariables)
+    case LoopItem(loopVar, range, body) =>
+      getVariables(range) ++ body.flatMap(getVariables(_)(loopVar +: ignore))
   }
   def listVariables(template: Template): Seq[String] =
     getVariables(template).distinct
