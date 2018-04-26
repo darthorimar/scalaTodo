@@ -12,10 +12,16 @@ class Renderer(conf: RenderConfig) {
 
 
   private def evalExpr(expr: Expression)(implicit localVars: Map[String, ExprType]): Result[ExprType] = expr match {
-    case Number(x) =>    Right(IntType(x))
+    case Number(x)    => Right(IntType(x))
     case BoolConst(x) => Right(BoolType(x))
-    case Str(x) =>       Right(StrType(x))
-    case Date(x) =>      Right(DateType(x))
+    case Str(x)       => Right(StrType(x))
+    case Date(x)      => Right(DateType(x))
+    case SeqVal(x) =>
+      x.map(evalExpr).sequence match {
+        case Right(rs) =>
+          Right(SeqType(rs))
+        case Left(message) => Left(message)
+      }
     case VarRef(x) =>
       localVars.get(x) match {
         case Some(v) => Right(v)
@@ -26,7 +32,7 @@ class Renderer(conf: RenderConfig) {
           }
       }
     case FuncCall(name, args) =>
-      args.map(evalExpr(_)(localVars)).sequence match {
+      args.map(evalExpr).sequence match {
         case Right(rs) =>
           Functions.callFunction(name, rs)
         case Left(message) => Left(message)

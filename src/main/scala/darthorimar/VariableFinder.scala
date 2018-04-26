@@ -24,6 +24,8 @@ object VariableFinder {
       args.flatMap(getVariables)
     case FuncCall(_, args) =>
       args.flatMap(getVariables)
+    case SeqVal(value) =>
+      value.flatMap(getVariables)
   }
   def listVariables(template: Template): Seq[String] =
     getVariables(template).distinct

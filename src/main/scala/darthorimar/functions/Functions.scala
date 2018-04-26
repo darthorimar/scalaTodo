@@ -3,7 +3,7 @@ package darthorimar.functions
 import java.nio.charset.{Charset, StandardCharsets}
 import java.time.format.DateTimeFormatter
 
-import darthorimar.renderer.{DateType, ExprType, IntType, StrType}
+import darthorimar.renderer.{DateType, ExprType, IntType, SeqType, StrType}
 
 import scala.io.Codec
 import scala.util.{Random, Try}
@@ -44,18 +44,19 @@ object Functions {
       },
       "bash" -> {
         case Nil =>
-          val codec = new Codec(Charset.forName("windows-1251"))
+          implicit val codec = new Codec(Charset.forName("windows-1251"))
           val qs =
             for {
-              rss <- Try(scala.io.Source.fromURL("https://bash.im/rss/")(codec))
+              rss <- Try(scala.io.Source.fromURL("https://bash.im/rss/"))
                         .map(_.getLines().mkString)
               xml <- Try(XML.loadString(rss))
               quotes =
               (xml \\ "channel" \ "item" \ "description")
                 .map(_.text)
                 .map { q =>
-                  q.replace("&lt", "<")
-                    .replace("&gt", ">")
+                  q.replace("&lt;", "<")
+                    .replace("&gt;", ">")
+                    .replace("&quot;", "\"")
                     .replace("<br>", "\n")
                 }
             } yield quotes
@@ -64,6 +65,12 @@ object Functions {
             .map { q =>
               StrType(q(Random.nextInt(q.length)))
             }
+      },
+      "range" -> {
+        case IntType(a)::IntType(b)::Nil =>
+          Right(SeqType(a.until(b).map(IntType)))
+        case IntType(b)::Nil =>
+          Right(SeqType(0.until(b).map(IntType)))
       }
     )
   def functionNames: Seq[String] = functions.keys.toSeq

@@ -27,3 +27,8 @@ case class DateType(v: LocalDateTime) extends ExprType {
   override def show: String = v.format(DateTimeFormatter.ISO_DATE_TIME)
   override def typeName: String = "Date"
 }
+
+case class SeqType(v: Seq[ExprType]) extends ExprType {
+  override def show: String = s"(${v.map(_.show).mkString(", ")})"
+  override def typeName: String = "Seq"
+}

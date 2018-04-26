@@ -9,11 +9,15 @@ import fastparse.core
 object ConfigParser {
   import ParserCommon._
 
+  private val seq: P[SeqType] =
+    P("Seq(" ~ value.rep(sep= "," ~ " ".rep) ~ ")").map(SeqType)
   private val value =
     P(number.map(IntType) |
       string.map(StrType) |
       boolConst.map(BoolType) |
-      date.map(DateType))
+      date.map(DateType) |
+      seq)
+
   private val entry =
     P(variable ~ "=" ~ value)
   private val parser: P[Map[String, ExprType]] =

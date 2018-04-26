@@ -29,7 +29,7 @@ object ParserCommon {
   val variable: P[String] =
     P((CharPred(_.isLower) ~ CharsWhile(_.isLetterOrDigit).rep).!
       .filter(!keywords.contains(_)))
-  var date: P[LocalDateTime] =
+  val date: P[LocalDateTime] =
     P("Date(" ~ CharsWhile(_ != ')').! ~ ")").filter { d =>
       parseDateTime(d).isSuccess
     } map {d =>

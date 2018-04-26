@@ -22,14 +22,18 @@ object ExpressionParser {
   private val parens: P[Expression] = P("(" ~ baseExpr ~ ")")
 
   private val funcCall =
-    P(variable ~ "(" ~ baseExpr.rep(sep=",") ~")") filter { case (name, _) =>
+    P(variable ~ "(" ~ baseExpr.rep(sep="," ~ " ".rep) ~")") filter { case (name, _) =>
       !keywords.contains(name)
     } map {case(name, args) =>
       FuncCall(name, args)
     }
 
+  private val seq: P[SeqVal] =
+    P("Seq(" ~ baseExpr.rep(sep="," ~ " ".rep) ~ ")").map(SeqVal)
+
   private val atom: P[Expression] =
     P(funcCall |
+      seq |
       date.map(Date) |
       variable.map(VarRef) |
       number.map(Number) |

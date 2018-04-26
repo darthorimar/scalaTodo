@@ -21,6 +21,7 @@ case class BinOp(op: String, left: Expression, right: Expression) extends Expres
 case class Number(num: Int) extends Expression
 case class Str(value: String) extends Expression
 case class BoolConst(value: Boolean) extends Expression
+case class SeqVal(value: Seq[Expression]) extends Expression
 case class Date(value: LocalDateTime) extends Expression
 case class VarRef(name: String) extends Expression
 case class FuncCall(name: String, args: Seq[Expression]) extends Expression
