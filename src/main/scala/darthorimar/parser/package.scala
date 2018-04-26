@@ -25,6 +25,6 @@ package object parser {
 
   implicit class StringOps(str: String) {
     def trimRight: String =
-      str.replaceAll("^\\s+", "")
+      str.replaceAll("\\s+$", "")
   }
 }

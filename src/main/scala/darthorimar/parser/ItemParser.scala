@@ -9,6 +9,7 @@ class ItemParser(indent: Int) {
   import ParserCommon._
 
   private val expression = ExpressionParser.parser
+  private val lineSep = "\n".rep(min=1)
 
   private val arg = P(variable)
   private val funcDefItem =
@@ -20,7 +21,7 @@ class ItemParser(indent: Int) {
     }
 
   private val definitions =
-    P(funcDefBlock.rep(sep = "\n"))
+    P(funcDefBlock.rep(sep = lineSep))
 
   private val textEntry =
     P(CharsWhile(!specialChars.contains(_)).!).map(TextEntry)
@@ -41,7 +42,7 @@ class ItemParser(indent: Int) {
 
   val deeper: P[Int] = P(" ".rep(indent + 1).!.map(_.length))
 
-  private val blockBody: P[Seq[Item]] = "\n" ~ deeper.flatMap { i =>
+  private val blockBody: P[Seq[Item]] = lineSep ~ deeper.flatMap { i =>
     new ItemParser(i).item.rep(1, sep = ("\n" + " " * i).~/)
   }
   private val block: P[Item] = P(itemValue ~ blockBody).map { case (i, is) =>
@@ -65,7 +66,7 @@ class ItemParser(indent: Int) {
     P(block | ifElseBlock | forBlock | itemValue.map(SimpleItem(_)) | defItem)
 
   private val template: P[Template] =
-    P((definitions ~ "\n").? ~ item.rep(sep = "\n") ~ End).map { case (defs, items) =>
+    P((definitions ~ lineSep).? ~ item.rep(sep = lineSep) ~ End).map { case (defs, items) =>
       Template(defs.toSeq.flatten, items)
     }
 
@@ -73,6 +74,9 @@ class ItemParser(indent: Int) {
 }
 
 object ItemParser {
-  def parse(template: String): Either[String, Template] =
-    new ItemParser(0).parser.parse(template.trimRight).toEither
+  def parse(template: String): Either[String, Template] = {
+    val filtered =
+      template.split('\n').filter(_.trim.nonEmpty).mkString("\n").trimRight
+    new ItemParser(0).parser.parse(filtered).toEither
+  }
 }
