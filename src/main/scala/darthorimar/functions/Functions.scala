@@ -1,6 +1,7 @@
 package darthorimar.functions
 
 import java.nio.charset.{Charset, StandardCharsets}
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 import darthorimar.renderer.{DateType, ExprType, IntType, SeqType, StrType}
@@ -10,6 +11,17 @@ import scala.util.{Random, Try}
 import scala.xml.XML
 
 object Functions {
+  private def dateRange[A](from :LocalDateTime,
+                        to: LocalDateTime,
+                        next: LocalDateTime => LocalDateTime,
+                        cmp: LocalDateTime => A) = {
+    def generateRange(x: LocalDateTime, range: Seq[LocalDateTime]): Seq[LocalDateTime] = {
+      if (cmp(x) == cmp(to)) range
+      else generateRange(x.plusDays(1), x +: range)
+    }
+    val range = generateRange(from, Seq.empty)
+    SeqType(range.reverse.map(DateType))
+  }
   private val functions: Map[String, PartialFunction[List[ExprType], Either[String, ExprType]]] =
     Map(
       "date" -> {
@@ -44,7 +56,7 @@ object Functions {
       },
       "bash" -> {
         case Nil =>
-          implicit val codec = new Codec(Charset.forName("windows-1251"))
+          implicit val codec: Codec = new Codec(Charset.forName("windows-1251"))
           val qs =
             for {
               rss <- Try(scala.io.Source.fromURL("https://bash.im/rss/"))
@@ -71,6 +83,23 @@ object Functions {
           Right(SeqType(a.until(b).map(IntType)))
         case IntType(b)::Nil =>
           Right(SeqType(0.until(b).map(IntType)))
+      }
+      ,
+      "dayRange" -> {
+        case DateType(a)::DateType(b)::Nil =>
+          Right(dateRange(a, b, _.plusDays(1), _.toLocalDate))
+      },
+      "monthRange" -> {
+        case DateType(a)::DateType(b)::Nil =>
+          Right(dateRange(a, b, _.plusMonths(1), _.toLocalDate))
+      },
+      "hourRange" -> {
+        case DateType(a)::DateType(b)::Nil =>
+          Right(dateRange(a, b, _.plusHours(1), identity))
+      },
+      "minuteRange" -> {
+        case DateType(a)::DateType(b)::Nil =>
+          Right(dateRange(a, b, _.plusMinutes(1), identity))
       }
     )
   def functionNames: Seq[String] = functions.keys.toSeq
