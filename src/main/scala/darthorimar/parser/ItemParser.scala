@@ -13,7 +13,7 @@ class ItemParser(indent: Int) {
 
   private val arg = P(variable)
   private val funcDefItem =
-    P("%%def" ~ " ".rep(min = 1) ~ variable ~ " ".rep ~ variable.rep(sep=" "))
+    P("%%def" ~ " ".rep(min = 1) ~ variable ~ " ".rep ~ variable.rep(sep=" ".rep(min = 1)))
 
   private val funcDefBlock =
     P(funcDefItem ~ blockBody) map { case (name, args, body) =>

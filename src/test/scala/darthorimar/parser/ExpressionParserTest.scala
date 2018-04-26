@@ -4,22 +4,30 @@ import darthorimar.ast._
 import darthorimar.parser._
 import utest._
 
-object ExpressionParserTest extends TestSuite {
-  private def testExpression(expr: String, expected: Expression): Unit = {
-    val parsed = ExpressionParser.parser.parse(expr).toEither
-    assert(parsed.isRight)
-    assert(parsed.right.get == expected)
-  }
+import fastparse.all._
 
-  private def testIncorrectExpression(expr: String): Unit = {
-    val parsed = ExpressionParser.parser.parse(expr).toEither
-    assert(parsed.isLeft)
-  }
+object ExpressionParserTest extends TestSuite with ParserTestMixin {
+  import ExpressionParser._
 
   val tests = Tests {
+    'funcCallTest - {
+      testParser("foo(1,2)", parser,
+        Some(FuncCall("foo", Seq(Number(1), Number(2)))))
+      testParser("foo()", parser,
+        Some(FuncCall("foo", Seq.empty)))
+      testParser("Foo()", parser, None)
+    }
+
+    'seqTest - {
+      testParser("Seq(1,2)", parser,
+        Some(SeqVal(Seq(Number(1), Number(2)))))
+      testParser("Seq()", parser,
+        Some(SeqVal(Seq.empty)))
+    }
+
     'ariphmicExpressionTest - {
       val expr = "1+2-3*(10*(2-3)/4)"
-      val expected =
+      val expected: Expression =
         BinOp("-",
           BinOp("+",
             Number(1),
@@ -33,7 +41,7 @@ object ExpressionParserTest extends TestSuite {
                   Number(2),
                   Number(3))),
               Number(4))))
-      testExpression(expr, expected)
+      testParser(expr, parser, Some(expected))
     }
 
     'boolExpressionTest - {
@@ -48,7 +56,7 @@ object ExpressionParserTest extends TestSuite {
             BinOp("=",
               VarRef("y"),
               VarRef("a"))))
-      testExpression(expr, expected)
+      testParser(expr, parser, Some(expected))
     }
 
     'stringExpressionTest - {
@@ -59,13 +67,13 @@ object ExpressionParserTest extends TestSuite {
             Str("a"),
             Str("b")),
           Str("ab"))
-      testExpression(expr, expected)
+      testParser(expr, parser, Some(expected))
     }
 
     'incorrectExpressionsTest - {
-      testIncorrectExpression("1**2")
-      testIncorrectExpression("1*(2-3")
-      testIncorrectExpression("and or false")
+      testParser("1**2", parser, None)
+      testParser("1*(2-3", parser, None)
+      testParser("and or false", parser, None)
     }
   }
 }

@@ -10,7 +10,7 @@ object FrontendTest extends TestSuite {
     new File(getClass.getResource(s"../$filename").getPath)
   }
 
-  private def testFrontend(templateFile: String, configFileOpt: Option[String], expected: String) = {
+  private def testFrontend(templateFile: String, configFileOpt: Option[String], expected: String): Unit = {
     val frontend = new Frontend(file(templateFile), configFileOpt.map(file))
     val rendered = frontend.render
     assert(rendered.isRight)

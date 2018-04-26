@@ -17,7 +17,7 @@ object ParserCommon {
       }
       .recoverWith { case _ =>
         Try(LocalTime.parse(dateTime))
-          .map(_.atDate(LocalDate.MIN))
+          .map(_.atDate(LocalDate.ofEpochDay(0)))
       }
   }
   val number: P[Int] =
@@ -25,7 +25,7 @@ object ParserCommon {
   val boolConst: P[Boolean] =
     P("true" | "false").!.map(_.toBoolean)
   val string: P[String] =
-    P("\"" ~ CharsWhile(_ != '"').! ~ "\"")
+    P("\"" ~ CharsWhile(_ != '"').?.! ~ "\"")
   val variable: P[String] =
     P((CharPred(_.isLower) ~ CharsWhile(_.isLetterOrDigit).rep).!
       .filter(!keywords.contains(_)))
