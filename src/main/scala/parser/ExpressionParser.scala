@@ -2,10 +2,10 @@ package parser
 
 import fastparse.all._
 import ast._
-import fastparse.all
 
 object ExpressionParser {
   import White._
+
   private def buildTree(tree: (Expression, Seq[(String, Expression)])) = {
     val (base, ops) = tree
     ops.foldLeft(base) { case (left, (op, right)) =>
@@ -26,5 +26,12 @@ object ExpressionParser {
     P(divMul ~ (CharIn("+-").! ~/ divMul).rep).map(buildTree)
   private val compOp: P[Expression] =
     P(addSub ~ (("<" | "<=" | ">" | ">=" | "=").! ~/ addSub).rep).map(buildTree)
-  val expression: P[Expression] = P(compOp)
+  private val baseExpr: P[Expression] = P(compOp)
+
+//  private val ifExpr: P[Expression] =
+//    P("if" ~ "(" ~ baseExpr ~ ")").map(IfExpr)
+
+  val expression: P[Expression] = P(baseExpr)
+
+
 }

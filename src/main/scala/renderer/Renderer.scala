@@ -15,29 +15,32 @@ object Renderer {
         case "/" => evalExpr(left) / evalExpr(right)
       }
   }
+  def renderItems(items: Seq[Item], indent: Int): String =
+    items.map(render(_, indent)).mkString
   def render(tree: AST, indent: Int = 0): String = tree match {
-    case Item(v, is) if is.isEmpty =>
+    case SimpleItem(v, is) if is.isEmpty =>
       " " * indent + s"${v.map(render(_)).mkString}\n"
-    case Item(v, is) =>
+    case SimpleItem(v, is) =>
       " " * indent + s"${v.map(render(_)).mkString}:\n" +
-        is.map(render(_, indent + 1)).mkString
-
+        renderItems(is, indent + 1)
     case TextEntry(text) => text
+    case ExpressionEntry(e: IfExpr) => evalExpr(e).toString
     case ExpressionEntry(e: Expression) => evalExpr(e).toString
+    case IfItem(expr, ifBody, elseBody) =>
+      if(evalExpr(expr) != 0) renderItems(ifBody, indent)
+      else renderItems(elseBody, indent)
   }
 
   def main(args: Array[String]): Unit = {
     val a =
-      s"""fds%{1+1*2*3}gfd
-        | b
-        | c
-        |  d
-        | f
-        |  r
-      """.stripMargin.trim
+      s"""%if(0)
+         | e
+         |%else
+         | b
+       """.stripMargin.trim
     val Parsed.Success(ast, x) = ItemParser().parser.parse(a).get
     println(ast)
     println("")
-    println(render(ast))
+    println(renderItems(ast, indent = 0))
   }
 }
