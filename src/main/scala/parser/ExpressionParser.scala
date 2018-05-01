@@ -5,6 +5,7 @@ import ast._
 import fastparse.all
 
 object ExpressionParser {
+  import White._
   private def buildTree(tree: (Expression, Seq[(String, Expression)])) = {
     val (base, ops) = tree
     ops.foldLeft(base) { case (left, (op, right)) =>
