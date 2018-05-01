@@ -15,23 +15,28 @@ object ExpressionParser {
 
   private val number: P[Expression] =
     P(CharIn('0' to '9').rep(1).!.map(x => Number(x.toInt)))
+  private val boolConst: P[Expression] =
+    P("true" | "false").!.map(x => BoolConst(x.toBoolean))
+
   private val string: P[Expression] =
     P("\"" ~ CharsWhile(_ != '"') ~ "\"").rep(1).!.map(Str)
-  private val parens: P[Expression] = P("(" ~/ addSub ~ ")")
-  private val atom: P[Expression] = P(number | string | parens)
+  private val parens: P[Expression] = P("(" ~/ baseExpr ~ ")")
+  private val atom: P[Expression] = P(number | string | boolConst | parens)
 
   private val divMul: P[Expression] =
     P(atom ~ (CharIn("*/").! ~/ atom).rep).map(buildTree)
   private val addSub: P[Expression] =
     P(divMul ~ (CharIn("+-").! ~/ divMul).rep).map(buildTree)
   private val compOp: P[Expression] =
-    P(addSub ~ (("<" | "<=" | ">" | ">=" | "=").! ~/ addSub).rep).map(buildTree)
-  private val baseExpr: P[Expression] = P(compOp)
+    P(addSub ~ (("<" | "<=" | ">" | ">=" | "=" | "!=").! ~/ addSub).rep).map(buildTree)
+  private val and: P[Expression] =
+    P(compOp ~ ("and".! ~/ compOp).rep).map(buildTree)
+  private val xor: P[Expression] =
+    P(and ~ ("or".! ~/ and).rep).map(buildTree)
+  private val or: P[Expression] =
+    P(xor ~ ("xor".! ~/ xor).rep).map(buildTree)
 
-//  private val ifExpr: P[Expression] =
-//    P("if" ~ "(" ~ baseExpr ~ ")").map(IfExpr)
+  private val baseExpr: P[Expression] = P(or)
 
   val expression: P[Expression] = P(baseExpr)
-
-
 }

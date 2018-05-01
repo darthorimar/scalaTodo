@@ -17,4 +17,5 @@ sealed trait Expression
 case class BinOp(op: String, left: Expression, right: Expression) extends Expression
 case class Number(num: Int) extends Expression
 case class Str(value: String) extends Expression
+case class BoolConst(value: Boolean) extends Expression
 case class IfExpr(expr: Expression) extends Expression

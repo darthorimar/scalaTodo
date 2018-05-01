@@ -13,7 +13,7 @@ class ItemParser(indent: Int) {
   private val expressionEntry =
     P("%{" ~ expression ~ "}").map(ExpressionEntry)
   private val ifItem =
-    P("%if" ~ expression)
+    P("%if" ~ " ".rep  ~ expression)
   private val elseItem =
     P("%else")
   private val itemValue = P((textEntry | expressionEntry).rep(min = 1))

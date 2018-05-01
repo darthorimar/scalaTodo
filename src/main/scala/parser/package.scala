@@ -1,5 +1,4 @@
 import fastparse.WhitespaceApi
-
 package object parser {
   val specialChars = Seq('%', '\n', '}', '{')
 
@@ -7,5 +6,4 @@ package object parser {
     import fastparse.all._
     NoTrace(" ".rep)
   }
-
 }
