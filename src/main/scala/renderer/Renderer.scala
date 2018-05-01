@@ -1,98 +1,87 @@
 package renderer
 
 import ast._
-import fastparse.core.Parsed
 import parser.ItemParser
 
-object Renderer {
-  type Result = Either[String, String]
+class Renderer(conf: RenderConfig) {
+  import Renderer._
 
-  sealed trait ExprResult{
-    def show: String
-    def typeName: String
-  }
-  case class IntResult(v: Int) extends ExprResult {
-    override def show: String = v.toString
-    override def typeName: String = "Int"
-  }
-  case class BoolResult(v: Boolean) extends ExprResult {
-    override def show: String = v.toString
-    override def typeName: String = "Bool"
-  }
-  case class StrResult(v: String) extends ExprResult {
-    override def show: String = v
-    override def typeName: String = "String"
-  }
-  case class ErrorResult(message: String) extends ExprResult {
-      override def show: String = message
-      override def typeName: String = "Error"
+  def render(template: Template): Result = {
+    renderItems(template.items, 0)
   }
 
-  private def evalExpr(expr: Expression): ExprResult = expr match {
-    case Number(x) => IntResult(x)
-    case BoolConst(x) => BoolResult(x)
-    case Str(x) => StrResult(x)
+  private def evalExpr(expr: Expression): ExprType = expr match {
+    case Number(x) => IntType(x)
+    case BoolConst(x) => BoolType(x)
+    case Str(x) => StrType(x)
+    case VarRef(x) =>
+      conf.variables.get(x) match {
+        case Some(v) => v
+        case None    => ErrorType(s"Variable $x ot found")
+      }
     case BinOp(op, left, right) =>
       val leftExpr = evalExpr(left)
       val rightExpr = evalExpr(right)
       (leftExpr, op, rightExpr) match {
-        case (IntResult(l), "+", IntResult(r))  => IntResult(l + r)
-        case (IntResult(l), "-", IntResult(r))  => IntResult(l - r)
-        case (IntResult(l), "*", IntResult(r))  => IntResult(l * r)
-        case (IntResult(l), "/", IntResult(r))  => IntResult(l / r)
-        case (IntResult(l), ">", IntResult(r))  => BoolResult(l > r)
-        case (IntResult(l), ">=", IntResult(r)) => BoolResult(l >= r)
-        case (IntResult(l), "<", IntResult(r))  => BoolResult(l < r)
-        case (IntResult(l), "<=", IntResult(r)) => BoolResult(l <= r)
-        case (IntResult(l), "=", IntResult(r))  => BoolResult(l == r)
-        case (IntResult(l), "!=", IntResult(r)) => BoolResult(l != r)
+        case (IntType(l), "+", IntType(r))  => IntType(l + r)
+        case (IntType(l), "-", IntType(r))  => IntType(l - r)
+        case (IntType(l), "*", IntType(r))  => IntType(l * r)
+        case (IntType(l), "/", IntType(r))  => IntType(l / r)
+        case (IntType(l), ">", IntType(r))  => BoolType(l > r)
+        case (IntType(l), ">=", IntType(r)) => BoolType(l >= r)
+        case (IntType(l), "<", IntType(r))  => BoolType(l < r)
+        case (IntType(l), "<=", IntType(r)) => BoolType(l <= r)
+        case (IntType(l), "=", IntType(r))  => BoolType(l == r)
+        case (IntType(l), "!=", IntType(r)) => BoolType(l != r)
 
-        case (BoolResult(l), "and", BoolResult(r)) => BoolResult(l && r)
-        case (BoolResult(l), "or", BoolResult(r))  => BoolResult(l || r)
-        case (BoolResult(l), "xor", BoolResult(r)) => BoolResult(l ^ r)
-        case (BoolResult(l), "=", BoolResult(r))   => BoolResult(l == r)
-        case (BoolResult(l), "!=", BoolResult(r))  => BoolResult(l != r)
+        case (BoolType(l), "and", BoolType(r)) => BoolType(l && r)
+        case (BoolType(l), "or", BoolType(r))  => BoolType(l || r)
+        case (BoolType(l), "xor", BoolType(r)) => BoolType(l ^ r)
+        case (BoolType(l), "=", BoolType(r))   => BoolType(l == r)
+        case (BoolType(l), "!=", BoolType(r))  => BoolType(l != r)
 
-        case (StrResult(l), "+", StrResult(r))  => StrResult(l + r)
-        case (StrResult(l), "=", StrResult(r))  => BoolResult(l == r)
-        case (StrResult(l), "!=", StrResult(r)) => BoolResult(l != r)
+        case (StrType(l), "+", StrType(r))  => StrType(l + r)
+        case (StrType(l), "=", StrType(r))  => BoolType(l == r)
+        case (StrType(l), "!=", StrType(r)) => BoolType(l != r)
 
-        case (ErrorResult(msg1), _, ErrorResult(msg2)) => ErrorResult(s"$msg1, $msg2")
-        case (_, _, ErrorResult(msg)) => ErrorResult(msg)
-        case (ErrorResult(msg), _, _) => ErrorResult(msg)
+        case (ErrorType(msg1), _, ErrorType(msg2)) => ErrorType(s"$msg1, $msg2")
+        case (_, _, ErrorType(msg)) => ErrorType(msg)
+        case (ErrorType(msg), _, _) => ErrorType(msg)
 
-        case _ => ErrorResult(s"Can not evaluate expression ${leftExpr.show} $op ${rightExpr.show}")
+        case _ => ErrorType(s"Can not evaluate expression ${leftExpr.show} $op ${rightExpr.show}")
       }
   }
 
-
   def renderItems(items: Seq[Item], indent: Int): Result =
-    items.map(render(_, indent)).sequence.map(_.mkString)
+    items.map(renderAst(_, indent)).sequence.map(_.mkString)
 
-  private def render(tree: AST, indent: Int = 0): Result = tree match {
+  private def renderAst(tree: AST, indent: Int = 0): Result = tree match {
     case SimpleItem(v, is) if is.isEmpty =>
-      v.map(render(_)).sequence.map(_.mkString)
+      v.map(renderAst(_)).sequence.map(_.mkString)
         .map(x => s" " * indent + s"$x\n")
 
     case SimpleItem(v, is) =>
       for {
-        x <- v.map(render(_)).sequence.map(_.mkString)
+        x <- v.map(renderAst(_)).sequence.map(_.mkString)
         y <- renderItems(is, indent + 1)
       } yield " " * indent + s"$x:\n" + y
 
     case TextEntry(text) => Right(text)
     case ExpressionEntry(e: Expression) =>
       evalExpr(e) match {
-        case ErrorResult(message) => Left(message)
+        case ErrorType(message) => Left(message)
         case x => Right(x.show)
       }
     case IfItem(expr, ifBody, elseBody) =>
       evalExpr(expr) match {
-        case BoolResult(cond) =>
+        case BoolType(cond) =>
           if (cond) renderItems(ifBody, indent)
           else renderItems(elseBody, indent)
-        case ErrorResult(message) => Left(message)
-        case x => Left(s"${x.typeName} can not be used as if condition")
+        case ErrorType(message) => Left(message)
+        case x => Left(s"${x.typeName} can not be used as condition")
       }
   }
+}
+object Renderer {
+  type Result = Either[String, String]
 }

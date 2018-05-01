@@ -27,16 +27,19 @@ class ItemParser(indent: Int) {
     SimpleItem(i, is)
   }
   private val ifBlock: all.Parser[(Expression, Seq[Item])] = P(ifItem ~ blockBody)
-  private val elseBlock: all.Parser[Seq[Item]] = P(elseItem ~ blockBody)
+  private val elseBlock: all.Parser[Seq[Item]] =
+    P("\n" ~ " ".rep(indent).!.map(_.length)).flatMap(i =>
+      elseItem ~ blockBody
+    )
 
-  private val ifElseBlock = ifBlock ~ ("\n" ~ elseBlock).? map {case (cond, ifItems, elseItems) =>
-      IfItem(cond, ifItems, elseItems.toSeq.flatten)
+  private val ifElseBlock = ifBlock ~ (elseBlock).? map {case (cond, ifItems, elseItems) =>
+    IfItem(cond, ifItems, elseItems.toSeq.flatten)
   }
 
   val item: P[Item] =
     P(block | ifElseBlock | itemValue.map(SimpleItem(_)) )
 
-  val parser: P[Seq[Item]] = P((ifElseBlock | block ).rep(sep = "\n") ~ End)
+  val parser: P[Seq[Item]] = P(item.rep(sep = "\n") ~ End)
 }
 
 object ItemParser {
