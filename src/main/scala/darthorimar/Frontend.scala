@@ -33,7 +33,7 @@ class Frontend(templateFile: File, configFileOpt: Option[File]) {
     }
   }
 
-  private def interactiveConfig(oldConf: RenderConfig, vars: Seq[String]) = {
+  private def interactiveConfig(oldConf: RenderConfig, vars: Seq[String]): RenderConfig = {
     if (vars.isEmpty) oldConf
     else {
       println(s"To continue please define following variables: ${vars.mkString(", ")}")
@@ -47,7 +47,11 @@ class Frontend(templateFile: File, configFileOpt: Option[File]) {
           case Left(_) => ()
         }
       }
-      RenderConfig(oldConf.variables ++ newVars)
+      val newConfig = RenderConfig(oldConf.variables ++ newVars)
+      if (newVars.size == vars.size)
+        newConfig
+      else
+        interactiveConfig(newConfig, (vars.toSet -- newVars.keys).toSeq)
     }
   }
 
