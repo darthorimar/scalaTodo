@@ -1,10 +1,11 @@
-package parser
+package darhorimar.parser
 
 import fastparse.all._
-import ast._
+import darhorimar.ast._
 
 object ExpressionParser {
   import White._
+  import ParserCommon._
 
   private def buildTree(tree: (Expression, Seq[(String, Expression)])) = {
     val (base, ops) = tree
@@ -13,17 +14,13 @@ object ExpressionParser {
     }
   }
 
-  private val number: P[Expression] =
-    P(CharIn('0' to '9').rep(1).!.map(x => Number(x.toInt)))
-  private val boolConst: P[Expression] =
-    P("true" | "false").!.map(x => BoolConst(x.toBoolean))
-  private val string: P[Expression] =
-    P("\"" ~ CharsWhile(_ != '"') ~ "\"").rep(1).!.map(Str)
-  private val variable: P[VarRef] =
-    P((CharPred(_.isLetter) ~ CharsWhile(_.isLetterOrDigit).rep).!
-      .filter(!keywords.contains(_))).map(VarRef)
   private val parens: P[Expression] = P("(" ~/ baseExpr ~ ")")
-  private val atom: P[Expression] = P(variable | number | string | boolConst | parens)
+  private val atom: P[Expression] =
+    P(variable.map(VarRef) |
+      number.map(Number) |
+      string.map(Str) |
+      boolConst.map(BoolConst) |
+      parens)
 
   private val divMul: P[Expression] =
     P(atom ~ (CharIn("*/").! ~/ atom).rep).map(buildTree)

@@ -1,3 +1,5 @@
+package darhorimar
+
 package object renderer {
   implicit class SeqEitherOps[A, B](seq: Seq[Either[A, B]]) {
     def sequence: Either[A, Seq[B]] =

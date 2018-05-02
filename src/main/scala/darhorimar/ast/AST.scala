@@ -1,4 +1,4 @@
-package ast
+package darhorimar.ast
 
 sealed trait AST
 

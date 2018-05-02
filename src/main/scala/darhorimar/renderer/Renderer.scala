@@ -1,7 +1,7 @@
-package renderer
+package darhorimar.renderer
 
-import ast._
-import parser.ItemParser
+import darhorimar.ast._
+import darhorimar.parser.ItemParser
 
 class Renderer(conf: RenderConfig) {
   import Renderer._
@@ -17,7 +17,7 @@ class Renderer(conf: RenderConfig) {
     case VarRef(x) =>
       conf.variables.get(x) match {
         case Some(v) => v
-        case None    => ErrorType(s"Variable $x ot found")
+        case None    => ErrorType(s"Variable $x not found")
       }
     case BinOp(op, left, right) =>
       val leftExpr = evalExpr(left)
@@ -64,7 +64,7 @@ class Renderer(conf: RenderConfig) {
       for {
         x <- v.map(renderAst(_)).sequence.map(_.mkString)
         y <- renderItems(is, indent + 1)
-      } yield " " * indent + s"$x:\n" + y
+      } yield " " * indent + s"$x\n" + y
 
     case TextEntry(text) => Right(text)
     case ExpressionEntry(e: Expression) =>

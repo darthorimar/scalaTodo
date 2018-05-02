@@ -1,4 +1,4 @@
-package renderer
+package darhorimar.renderer
 
 sealed trait ExprType {
   def show: String

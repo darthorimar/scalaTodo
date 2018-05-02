@@ -1,7 +1,7 @@
-package parser
+package darhorimar.parser
 
 import fastparse.all._
-import ast._
+import darhorimar.ast._
 import fastparse.all
 
 class ItemParser(indent: Int) {
