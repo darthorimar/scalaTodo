@@ -1,10 +1,10 @@
-package darhorimar
+package darthorimar
 
 import java.io.File
 
-import darhorimar.parser.{ConfigParser, TemplateParser}
-import darhorimar.renderer.{ErrorType, ExprType, RenderConfig, Renderer}
-import darhorimar.VariableFinder._
+import darthorimar.parser.{ConfigParser, TemplateParser}
+import darthorimar.renderer.{ErrorType, ExprType, RenderConfig, Renderer}
+import darthorimar.VariableFinder._
 
 import scala.io.Source
 import scala.util._
@@ -21,7 +21,6 @@ class Frontend(templateFile: File, configFileOpt: Option[File]) {
           for {
             conf <- readFile(configFile)
             parsed <- ConfigParser.parse(conf)
-            _ = println(parsed)
           } yield parsed
         case None =>
           Right(RenderConfig(Map.empty))

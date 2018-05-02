@@ -1,7 +1,7 @@
-package darhorimar.renderer
+package darthorimar.renderer
 
-import darhorimar.ast._
-import darhorimar.parser.ItemParser
+import darthorimar.ast._
+import darthorimar.parser.ItemParser
 
 class Renderer(conf: RenderConfig) {
   import Renderer._

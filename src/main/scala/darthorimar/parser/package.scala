@@ -1,6 +1,6 @@
-package darhorimar
+package darthorimar
 
-import darhorimar.ast.Template
+import darthorimar.ast.Template
 import fastparse.WhitespaceApi
 import fastparse.core.Parsed
 
@@ -15,7 +15,9 @@ package object parser {
   implicit class ParsedOps[T, Elem, Repr](parsed: Parsed[T, Elem, Repr]) {
     def toEither: Either[String, T] =
       parsed.fold({ case (_, _, info) =>
-        Left(s"Syntax error ${info.traced.toString}")
+        Left(
+          s"""Syntax error
+             |${info.traced.trace}""".stripMargin)
       }, { case (v, _) =>
         Right(v)
       })

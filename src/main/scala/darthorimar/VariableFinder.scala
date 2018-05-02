@@ -1,6 +1,6 @@
-package darhorimar
+package darthorimar
 
-import darhorimar.ast._
+import darthorimar.ast._
 
 object VariableFinder {
   private def getVariables(tree: AST): Seq[String] = tree match {

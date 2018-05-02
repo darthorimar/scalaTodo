@@ -1,3 +1,3 @@
-package darhorimar.renderer
+package darthorimar.renderer
 
 case class RenderConfig(variables: Map[String, ExprType])

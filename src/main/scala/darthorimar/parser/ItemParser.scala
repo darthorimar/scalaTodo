@@ -1,13 +1,12 @@
-package darhorimar.parser
+package darthorimar.parser
 
 import fastparse.all._
-import darhorimar.ast._
+import darthorimar.ast._
 import fastparse.all
 
 class ItemParser(indent: Int) {
 
-  import ExpressionParser.expression
-
+  private val expression = ExpressionParser.parser
   private val textEntry =
     P(CharsWhile(!specialChars.contains(_)).!).map(TextEntry)
   private val expressionEntry =
@@ -32,7 +31,7 @@ class ItemParser(indent: Int) {
       elseItem ~ blockBody
     )
 
-  private val ifElseBlock = ifBlock ~ (elseBlock).? map {case (cond, ifItems, elseItems) =>
+  private val ifElseBlock = ifBlock ~ elseBlock.? map {case (cond, ifItems, elseItems) =>
     IfItem(cond, ifItems, elseItems.toSeq.flatten)
   }
 

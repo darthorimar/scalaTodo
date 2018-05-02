@@ -1,4 +1,4 @@
-package darhorimar
+package darthorimar
 
 package object renderer {
   implicit class SeqEitherOps[A, B](seq: Seq[Either[A, B]]) {

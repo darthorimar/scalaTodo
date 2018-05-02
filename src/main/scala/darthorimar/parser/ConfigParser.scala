@@ -1,6 +1,6 @@
-package darhorimar.parser
+package darthorimar.parser
 
-import darhorimar.renderer.{BoolType, ExprType, IntType, RenderConfig, StrType}
+import darthorimar.renderer.{BoolType, ExprType, IntType, RenderConfig, StrType}
 import fastparse.all._
 import fastparse.core
 

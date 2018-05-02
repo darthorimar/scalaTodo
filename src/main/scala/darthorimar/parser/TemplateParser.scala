@@ -1,6 +1,6 @@
-package darhorimar.parser
+package darthorimar.parser
 
-import darhorimar.ast._
+import darthorimar.ast._
 
 object TemplateParser {
   def parse(template: String): Either[String, Template] =

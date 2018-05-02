@@ -1,6 +1,6 @@
-package darhorimar.parser
+package darthorimar.parser
 
-import darhorimar.ast.VarRef
+import darthorimar.ast.VarRef
 import fastparse.all._
 
 object ParserCommon {
@@ -9,7 +9,7 @@ object ParserCommon {
   val boolConst: P[Boolean] =
     P("true" | "false").!.map(_.toBoolean)
   val string: P[String] =
-    P("\"" ~ CharsWhile(_ != '"') ~ "\"").rep(1).!
+    P("\"" ~ CharsWhile(_ != '"').! ~ "\"")
   val variable: P[String] =
     P((CharPred(_.isLetter) ~ CharsWhile(_.isLetterOrDigit).rep).!
       .filter(!keywords.contains(_)))
