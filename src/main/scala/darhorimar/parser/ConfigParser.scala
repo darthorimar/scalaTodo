@@ -17,4 +17,7 @@ object ConfigParser {
 
   def parse(conf: String): Either[String, RenderConfig] =
     parser.parse(conf).toEither.map(RenderConfig)
+
+  def parseValue(v: String): Either[String, ExprType] =
+    value.parse(v).toEither
 }
