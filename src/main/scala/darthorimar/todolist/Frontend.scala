@@ -4,7 +4,7 @@ import java.io.File
 
 import darthorimar.todolist.parser.{ConfigParser, ItemParser}
 import darthorimar.todolist.render.{ConsoleRender, Render, RenderConfig, WebRender}
-import darthorimar.todolist.runner.{ConsoleRunner, Runner}
+import darthorimar.todolist.runner.{ConsoleRunner, Runner, WebRunner}
 
 import scala.io.Source
 import scala.util._
@@ -57,7 +57,7 @@ class Frontend(config: AppConfig) {
 
   private val runner: Runner = displayMode match {
     case ConsoleDisplayMode => new ConsoleRunner
-    case WebDisplayMode     => new ConsoleRunner
+    case WebDisplayMode     => new WebRunner
   }
 
   private val render: Render = displayMode match {

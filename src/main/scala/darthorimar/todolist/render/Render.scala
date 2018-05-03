@@ -5,7 +5,7 @@ import darthorimar.todolist.ast._
 import darthorimar.todolist.render.Render.{State, evalExpr}
 
 trait Render {
-  def display(astMarket: AST, content: String, indent: Int): String
+  def display(astMarket: AST, content: Seq[String], indent: Int): String
 
   def render(template: Template, renderConf: RenderConfig): Result[String] =
     renderAst(template)(State.empty, renderConf)
@@ -20,15 +20,15 @@ trait Render {
     case Template(defs, items) =>
       val defsMap = defs.map(d => d.name -> d).toMap
       renderItems(items, 0)(State(defsMap, Map.empty), renderConf)
-        .map(display(tree, _, indent))
+        .map(x => display(tree, Seq(x), indent))
     case SimpleItem(v, is) if is.isEmpty =>
       v.map(renderAst(_)).sequence.map(_.mkString)
-        .map(display(tree, _, indent))
+        .map(x => display(tree, Seq(x), indent))
     case SimpleItem(v, is) =>
       (for {
         x <- v.map(renderAst(_)).sequence.map(_.mkString)
         y <- renderItems(is, indent + 1)
-      } yield s"$x\n$y")
+      } yield Seq(x, y))
         .map(display(tree, _, indent))
     case TextEntry(text) => Right(text)
     case ExpressionEntry(e: Expression) =>
