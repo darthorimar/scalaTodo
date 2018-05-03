@@ -25,6 +25,9 @@ object Functions {
   }
   private val functions: Map[String, PartialFunction[List[ExprType], Either[String, ExprType]]] =
     Map(
+      "now" -> {
+        case Nil => Right(DateType(LocalDateTime.now))
+      },
       "date" -> {
         case DateType(d)::Nil => Right(StrType(d.format(DateTimeFormatter.ISO_LOCAL_DATE)))
       },
@@ -101,6 +104,14 @@ object Functions {
       "minuteRange" -> {
         case DateType(a)::DateType(b)::Nil =>
           Right(dateRange(a, b, _.plusMinutes(1), identity))
+      },
+      "rand" -> {
+        case IntType(a)::IntType(b)::Nil =>
+          Right(IntType(Random.nextInt(b - a + 1) + a))
+      },
+      "randChoice" -> {
+        case SeqType(s)::IntType(c)::Nil =>
+          Right(SeqType(Random.shuffle(s).take(c)))
       }
     )
   def functionNames: Seq[String] = functions.keys.toSeq
