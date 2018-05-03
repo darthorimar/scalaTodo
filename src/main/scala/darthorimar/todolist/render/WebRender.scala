@@ -18,8 +18,8 @@ class WebRender extends Render {
        |</div>""".stripMargin
 
   override def display(astMarker: AST, content: Seq[String], indent: Int): String = astMarker match {
-    case _: Template =>
-      s"""<h1 class="text-center">Todo List</h1>
+    case Template(title, _, _) =>
+      s"""<h1 class="text-center">$title</h1>
          |<div class="list-group list-group-root well">
          |${content.head}
          |</div>""".stripMargin

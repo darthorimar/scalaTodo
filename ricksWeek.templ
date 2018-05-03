@@ -1,0 +1,19 @@
+#Rick's todo list
+
+%%def typicalMorning d
+ Remember that today is %{format(d, "dd-MM-yy")}
+ And then %{randChoice(ideas)}
+
+%loop d <- dayRange(now(), addWeek(now()))
+ %{dayOfWeek(d)}
+  %if contains(Seq(2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31), day(d))
+   Today is a "prime" day!
+  %else
+   Today is a usual day
+  Read a cool bash quote:
+     %{bash()}
+  %def typicalMorning %{d}
+  Remember what does int mean %{rand(0,10)} %{rand(0,10)} %{rand(0,10)}
+  Drink sth
+  %loop phrase <- randSubseq(phrases, 3)
+   %{phrase}

@@ -17,7 +17,7 @@ trait Render {
 
   private def renderAst(tree: AST, indent: Int = 0)
                        (implicit state: State, renderConf: RenderConfig): Result[String] = tree match {
-    case Template(defs, items) =>
+    case Template(title, defs, items) =>
       val defsMap = defs.map(d => d.name -> d).toMap
       renderItems(items, 0)(State(defsMap, Map.empty), renderConf)
         .map(x => display(tree, Seq(x), indent))

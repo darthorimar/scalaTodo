@@ -46,13 +46,17 @@
           background-color: f8f9fa;
           cursor: pointer;
         }
+
+        input[type="checkbox"] {
+            pointer-events: none;
+        }
     </style>
     <script type="text/javascript">
       $(document).ready(function() {
         $(".list-group-item").click(function(event) {
           event.preventDefault();
           $(this).toggleClass("checked");
-          var checkbox = $(this).find("input[type=checkbox]")
+          var checkbox = $(this).find('input[type="checkbox"]')
           checkbox.attr("checked", !checkbox.attr("checked"));
         });
       });

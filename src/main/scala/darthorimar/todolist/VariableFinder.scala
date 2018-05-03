@@ -3,8 +3,9 @@ package darthorimar.todolist
 import darthorimar.todolist.ast._
 
 object VariableFinder {
-  private def getVariables(tree: AST)(implicit ignore: Seq[String] = Seq.empty): Seq[String] = tree match {
-    case Template(defs, items) => 
+  private def getVariables(tree: AST)
+                          (implicit ignore: Seq[String] = Seq.empty): Seq[String] = tree match {
+    case Template(_, defs, items) =>
       defs.flatMap(getVariables) ++ items.flatMap(getVariables)
     case DefItem(_, args, body) =>
       body.flatMap(getVariables(_)(ignore ++ args))

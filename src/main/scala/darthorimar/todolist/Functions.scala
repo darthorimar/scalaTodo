@@ -1,8 +1,10 @@
 package darthorimar.todolist
 
 import java.nio.charset.Charset
+import java.text.SimpleDateFormat
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
+import java.time.format.{DateTimeFormatter, TextStyle}
+import java.util.Locale
 
 import scala.io.Codec
 import scala.util.{Random, Try}
@@ -46,6 +48,9 @@ object Functions {
       "day" -> {
         case DateType(d)::Nil => Right(IntType(d.getDayOfMonth))
       },
+      "dayOfWeek" -> {
+        case DateType(d)::Nil => Right(StrType(d.getDayOfWeek.getDisplayName(TextStyle.FULL, Locale.ENGLISH)))
+      },
       "month" -> {
         case DateType(d)::Nil => Right(IntType(d.getMonthValue))
       },
@@ -54,6 +59,9 @@ object Functions {
       },
       "year" -> {
         case DateType(d)::Nil => Right(IntType(d.getYear))
+      },
+      "format" -> {
+        case DateType(d)::StrType(f)::Nil => Right(StrType(d.format(DateTimeFormatter.ofPattern(f))))
       },
       "bash" -> {
         case Nil =>
@@ -107,8 +115,20 @@ object Functions {
           Right(IntType(Random.nextInt(b - a + 1) + a))
       },
       "randChoice" -> {
+        case SeqType(s)::Nil =>
+          Right(s(Random.nextInt(s.length)))
+      },
+      "randSubseq" -> {
         case SeqType(s)::IntType(c)::Nil =>
           Right(SeqType(Random.shuffle(s).take(c)))
+      },
+      "addWeek" -> {
+        case DateType(s)::Nil =>
+          Right(DateType(s.plusWeeks(1)))
+      },
+      "contains" -> {
+        case SeqType(s)::(e: ExprType)::Nil =>
+          Right(BoolType(s.contains(e)))
       }
     )
   def functionNames: Seq[String] = functions.keys.toSeq
