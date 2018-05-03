@@ -6,23 +6,29 @@ import darthorimar.todolist.ast._
 import scala.language.postfixOps
 
 class WebRender extends Render {
+  private def escapeText(text: String) =
+    text.replaceAllLiterally("<", "&lt;")
+      .replaceAllLiterally(">", "&gt;")
+      .replaceAllLiterally("\n", "<br>")
+
+  private def renderItem(content: String) =
+    s"""<div class="list-group-item">
+       |<input type="checkbox" aria-label="...">
+       |${escapeText(content)}
+       |</div>""".stripMargin
+
   override def display(astMarker: AST, content: Seq[String], indent: Int): String = astMarker match {
     case _: Template =>
-      s"""<div class="list-group list-group-root well">
+      s"""<h1 class="text-center">Todo List</h1>
+         |<div class="list-group list-group-root well">
          |${content.head}
          |</div>""".stripMargin
 
     case SimpleItem(_, is) if is.isEmpty =>
-      s"""<a href="#" class="list-group-item">
-         |<input type="checkbox" aria-label="...">
-         |${content.head}
-         |</a>""".stripMargin
+      renderItem(content.head)
 
     case _: SimpleItem =>
-      s"""<a href="#" class="list-group-item">
-         |  <input type="checkbox" aria-label="...">
-         |  ${content.head}
-         |</a>
+      s"""${renderItem(content.head)}
          |<div class="list-group">
          |${content(1)}
          |</div>""".stripMargin

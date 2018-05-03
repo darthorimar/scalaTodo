@@ -1,6 +1,7 @@
 <html>
 <head>
     <link rel="stylesheet" href="/static/bootstrap.min.css">
+    <script src="/static/jquery-3.3.1.min.js"></script>
     <script src="/static/bootstrap.min.js"></script>
     <style>
         .just-padding {
@@ -32,11 +33,33 @@
         .list-group.list-group-root > .list-group > .list-group > .list-group-item {
           padding-left: 45px;
         }
+
+        .checked {
+         text-decoration: line-through;
+        }
+
+        .list-group-item {
+         font-size: 20pt;
+        }
+
+        .list-group-item:hover{
+          background-color: f8f9fa;
+          cursor: pointer;
+        }
     </style>
+    <script type="text/javascript">
+      $(document).ready(function() {
+        $(".list-group-item").click(function(event) {
+          event.preventDefault();
+          $(this).toggleClass("checked");
+          var checkbox = $(this).find("input[type=checkbox]")
+          checkbox.attr("checked", !checkbox.attr("checked"));
+        });
+      });
+    </script>
 </head>
 <body>
 <div class="container">
-    <h1>Todo List</h1>
     {{content}}
 </div>
 </body>

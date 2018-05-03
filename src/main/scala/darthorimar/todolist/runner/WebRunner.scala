@@ -12,7 +12,7 @@ import akka.http.scaladsl.server.directives.ContentTypeResolver.Default
 
 class WebRunner extends Runner {
   private def renderHtmlTemplate(content: String) =
-    Source.fromResource("index.html").getLines.mkString
+    Source.fromResource("index.html").getLines.mkString("\n")
       .replaceAllLiterally("{{content}}", content)
 
   override def run(text: String): Unit = {
@@ -26,13 +26,12 @@ class WebRunner extends Runner {
         }
       } ~
         path("static" / Segment) { name =>
-          println(name)
           getFromResource(name)
         }
-
+    println("Starting web server...")
     val bindingFuture = Http().bindAndHandle(route, "localhost", 8080)
 
-    println(s"Server online at http://localhost:8080/\nPress ENTER to stop...")
+    println(s"Server online at http://localhost:8080/\nPress ENTER to stop")
     StdIn.readLine()
     bindingFuture
       .flatMap(_.unbind())
