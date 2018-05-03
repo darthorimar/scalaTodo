@@ -7,13 +7,13 @@ import scala.collection.mutable.ArrayBuffer
 
 object ItemParserTest extends TestSuite {
   private def testItem(items: String, expected: Seq[Item]): Unit = {
-    val parsed = ItemParser().parser.parse(items).toEither
+    val parsed = ItemParser.parse(items)
     assert(parsed.isRight)
     assert(parsed.right.get == expected)
   }
 
   private def testIncorrectItems(items: String): Unit = {
-    val parsed = ItemParser().parser.parse(items).toEither
+    val parsed = ItemParser.parse(items)
     assert(parsed.isLeft)
   }
 

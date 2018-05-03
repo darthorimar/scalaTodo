@@ -7,15 +7,15 @@ class Renderer(conf: RenderConfig) {
   import Renderer._
 
   def render(template: Template): Result = {
-    renderItems(template.items, 0)
+    renderAst(template)(State(Map.empty, Map.empty))
   }
 
-  private def evalExpr(expr: Expression): ExprType = expr match {
+  private def evalExpr(expr: Expression)(implicit localVars: Map[String, ExprType]): ExprType = expr match {
     case Number(x) => IntType(x)
     case BoolConst(x) => BoolType(x)
     case Str(x) => StrType(x)
     case VarRef(x) =>
-      conf.variables.get(x) match {
+      (conf.variables ++ localVars).get(x) match {
         case Some(v) => v
         case None    => ErrorType(s"Variable $x not found")
       }
@@ -52,10 +52,13 @@ class Renderer(conf: RenderConfig) {
       }
   }
 
-  def renderItems(items: Seq[Item], indent: Int): Result =
+  def renderItems(items: Seq[Item], indent: Int)(implicit state: State): Result =
     items.map(renderAst(_, indent)).sequence.map(_.mkString)
 
-  private def renderAst(tree: AST, indent: Int = 0): Result = tree match {
+  private def renderAst(tree: AST, indent: Int = 0)(implicit state: State): Result = tree match {
+    case Template(defs, items) =>
+      val defsMap = defs.map(d => d.name -> d).toMap
+      renderItems(items, 0)(State(defsMap, Map.empty))
     case SimpleItem(v, is) if is.isEmpty =>
       v.map(renderAst(_)).sequence.map(_.mkString)
         .map(x => s" " * indent + s"$x\n")
@@ -68,20 +71,33 @@ class Renderer(conf: RenderConfig) {
 
     case TextEntry(text) => Right(text)
     case ExpressionEntry(e: Expression) =>
-      evalExpr(e) match {
+      evalExpr(e)(state.localVars) match {
         case ErrorType(message) => Left(message)
         case x => Right(x.show)
       }
     case IfItem(expr, ifBody, elseBody) =>
-      evalExpr(expr) match {
+      evalExpr(expr)(state.localVars) match {
         case BoolType(cond) =>
           if (cond) renderItems(ifBody, indent)
           else renderItems(elseBody, indent)
         case ErrorType(message) => Left(message)
         case x => Left(s"${x.typeName} can not be used as condition")
       }
+    case FuncDefItem(name, args) =>
+      state.defs.get(name) match {
+        case Some(d: FuncDef) =>
+          if (args.length == d.args.length) {
+            val locals = d.args.zip(args.map(evalExpr(_)(state.localVars))).toMap
+            renderItems(d.body, indent)(state.copy(localVars = state.localVars ++ locals))
+          } else Left(s"Wrong number of arguments for definition $name")
+        case None =>
+          Left(s"Definition $name not found")
+      }
   }
 }
 object Renderer {
   type Result = Either[String, String]
+  case class State(defs: Map[String, Def], localVars: Map[String, ExprType])
+
+  def apply(conf: RenderConfig): Renderer = new Renderer(conf)
 }

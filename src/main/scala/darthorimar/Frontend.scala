@@ -2,9 +2,8 @@ package darthorimar
 
 import java.io.File
 
-import darthorimar.parser.{ConfigParser, TemplateParser}
-import darthorimar.renderer.{ErrorType, ExprType, RenderConfig, Renderer}
-import darthorimar.VariableFinder._
+import darthorimar.parser.{ConfigParser, ItemParser}
+import darthorimar.renderer.{ExprType, RenderConfig, Renderer}
 
 import scala.io.Source
 import scala.util._
@@ -58,10 +57,10 @@ class Frontend(templateFile: File, configFileOpt: Option[File]) {
   def render: Either[String, String] =
     for {
       template <- readFile(templateFile)
-      parsed <- TemplateParser.parse(template)
+      parsed <- ItemParser.parse(template)
       variables = VariableFinder.listVariables(parsed)
       conf <- generateConfig(variables)
-      rendered <- new Renderer(conf).render(parsed)
+      rendered <- Renderer(conf).render(parsed)
     } yield rendered
 }
 
