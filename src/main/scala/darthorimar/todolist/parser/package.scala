@@ -1,6 +1,5 @@
-package darthorimar
+package darthorimar.todolist
 
-import darthorimar.ast.Template
 import fastparse.WhitespaceApi
 import fastparse.core.Parsed
 import fastparse.core.Parsed.TracedFailure

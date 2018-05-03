@@ -1,12 +1,9 @@
-package darthorimar.parser
+package darthorimar.todolist.parser
 
 import java.time.LocalDateTime
 
 import fastparse.all._
-import darthorimar.ast._
-import darthorimar.functions.Functions
-import darthorimar.parser.ParserCommon.date
-import darthorimar.renderer.DateType
+import darthorimar.todolist.ast._
 
 object ExpressionParser {
   import White._

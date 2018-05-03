@@ -1,12 +1,9 @@
-package darthorimar.functions
+package darthorimar.todolist
 
-import java.nio.charset.{Charset, StandardCharsets}
+import java.nio.charset.Charset
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-import darthorimar.renderer.{DateType, ExprType, IntType, SeqType, StrType}
-
-import scala.annotation.tailrec
 import scala.io.Codec
 import scala.util.{Random, Try}
 import scala.xml.XML

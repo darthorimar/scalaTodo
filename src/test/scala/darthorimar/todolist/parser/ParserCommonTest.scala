@@ -1,4 +1,4 @@
-package darthorimar.parser
+package darthorimar.todolist.parser
 
 import java.time.{LocalDate, LocalDateTime, LocalTime}
 

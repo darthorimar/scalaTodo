@@ -1,19 +1,18 @@
-package darthorimar.renderer
+package darthorimar.todolist.render
 
-import darthorimar.ast._
-import darthorimar.functions.Functions
-import darthorimar.parser.ItemParser
+import darthorimar.todolist._
+import darthorimar.todolist.ast._
+import darthorimar.todolist.Functions
 
 import scala.language.postfixOps
 
-class Renderer(conf: RenderConfig) {
-  import Renderer._
+class ConsoleRender extends Render {
+  import ConsoleRender._
 
-  def render(template: Template): Result[String] =
-    renderAst(template)(State(Map.empty, Map.empty))
+  override def render(template: Template, renderConf: RenderConfig): Result[String] =
+    renderAst(template)(State.empty, renderConf)
 
-
-  private def evalExpr(expr: Expression)(implicit localVars: Map[String, ExprType]): Result[ExprType] = expr match {
+  private def evalExpr(expr: Expression)(implicit localVars: Map[String, ExprType], renderConf: RenderConfig): Result[ExprType] = expr match {
     case Number(x)    => Right(IntType(x))
     case BoolConst(x) => Right(BoolType(x))
     case Str(x)       => Right(StrType(x))
@@ -28,7 +27,7 @@ class Renderer(conf: RenderConfig) {
       localVars.get(x) match {
         case Some(v) => Right(v)
         case None =>
-          conf.variables.get(x) match {
+          renderConf.variables.get(x) match {
             case Some(v) => Right(v)
             case None    => Left(s"Variable $x not found")
           }
@@ -75,13 +74,13 @@ class Renderer(conf: RenderConfig) {
       }
   }
 
-  private def renderItems(items: Seq[Item], indent: Int)(implicit state: State): Result[String] =
+  private def renderItems(items: Seq[Item], indent: Int)(implicit state: State, renderConf: RenderConfig): Result[String] =
     items.map(renderAst(_, indent)).sequence.map(_.mkString)
 
-  private def renderAst(tree: AST, indent: Int = 0)(implicit state: State): Result[String] = tree match {
+  private def renderAst(tree: AST, indent: Int = 0)(implicit state: State, renderConf: RenderConfig): Result[String] = tree match {
     case Template(defs, items) =>
       val defsMap = defs.map(d => d.name -> d).toMap
-      renderItems(items, 0)(State(defsMap, Map.empty))
+      renderItems(items, 0)(State(defsMap, Map.empty), renderConf)
     case SimpleItem(v, is) if is.isEmpty =>
       v.map(renderAst(_)).sequence.map(_.mkString)
         .map(x => s" " * indent + s"$x\n")
@@ -94,9 +93,9 @@ class Renderer(conf: RenderConfig) {
 
     case TextEntry(text) => Right(text)
     case ExpressionEntry(e: Expression) =>
-      evalExpr(e)(state.localVars).map(_.show)
+      evalExpr(e)(state.localVars, renderConf).map(_.show)
     case IfItem(expr, ifBody, elseBody) =>
-      evalExpr(expr)(state.localVars) match {
+      evalExpr(expr)(state.localVars, renderConf) match {
         case Right(BoolType(cond)) =>
           if (cond) renderItems(ifBody, indent)
           else renderItems(elseBody, indent)
@@ -107,10 +106,10 @@ class Renderer(conf: RenderConfig) {
       state.defs.get(name) match {
         case Some(d: DefItem) =>
           if (args.length == d.args.length) {
-            args.map(evalExpr(_)(state.localVars)).sequence match {
+            args.map(evalExpr(_)(state.localVars, renderConf)).sequence match {
               case Right(rs) =>
                 val locals = d.args.zip(rs).toMap
-                renderItems(d.body, indent)(state.copy(localVars = state.localVars ++ locals))
+                renderItems(d.body, indent)(state.copy(localVars = state.localVars ++ locals), renderConf)
               case Left(message) => Left(message)
             }
           } else Left(s"Wrong number of arguments for definition $name")
@@ -118,12 +117,12 @@ class Renderer(conf: RenderConfig) {
           Left(s"Definition $name not found")
       }
     case LoopItem(loopVar, range, body) =>
-      evalExpr(range)(state.localVars) match {
+      evalExpr(range)(state.localVars, renderConf) match {
         case Right(SeqType(r)) =>
           val items =
             r map { i =>
               val newState = state.copy(localVars = state.localVars + (loopVar -> i))
-              renderItems(body, indent)(newState)
+              renderItems(body, indent)(newState, renderConf)
             } sequence
 
         items.map(_.mkString)
@@ -132,9 +131,10 @@ class Renderer(conf: RenderConfig) {
       }
   }
 }
-object Renderer {
-  type Result[+T] = Either[String, T]
+object ConsoleRender {
   case class State(defs: Map[String, MetaItem], localVars: Map[String, ExprType])
 
-  def apply(conf: RenderConfig): Renderer = new Renderer(conf)
+  object State {
+    def empty: State = State(Map.empty, Map.empty)
+  }
 }

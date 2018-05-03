@@ -1,9 +1,9 @@
-package darthorimar.parser
+package darthorimar.todolist.parser
 
 import java.sql.Timestamp
 import java.time.{LocalDate, LocalDateTime, LocalTime}
 
-import darthorimar.ast.VarRef
+import darthorimar.todolist.ast.VarRef
 import fastparse.all._
 
 import scala.util.Try

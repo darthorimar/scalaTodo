@@ -1,7 +1,7 @@
-package darthorimar.parser
+package darthorimar.todolist.parser
 
-import darthorimar.ast._
-import darthorimar.parser._
+import darthorimar.todolist.ast._
+import darthorimar.todolist.parser._
 import utest._
 
 import fastparse.all._

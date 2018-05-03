@@ -1,6 +1,6 @@
-package darthorimar.parser
+package darthorimar.todolist.parser
 
-import darthorimar.ast._
+import darthorimar.todolist.ast._
 import utest._
 
 import scala.collection.mutable.ArrayBuffer

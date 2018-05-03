@@ -1,9 +1,7 @@
-package darthorimar
+package darthorimar.todolist
 
 import java.time.LocalDateTime
 
-import darthorimar.functions.Functions
-import darthorimar.renderer.{DateType, IntType, SeqType, StrType}
 import utest._
 
 object FunctionsTest extends TestSuite{

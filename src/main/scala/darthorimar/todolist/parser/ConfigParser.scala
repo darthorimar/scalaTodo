@@ -1,8 +1,9 @@
-package darthorimar.parser
+package darthorimar.todolist.parser
 
 import java.time.{LocalDate, LocalDateTime}
 
-import darthorimar.renderer._
+import darthorimar.todolist._
+import darthorimar.todolist.render._
 import fastparse.all._
 import fastparse.core
 

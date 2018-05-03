@@ -1,7 +1,7 @@
-package darthorimar.parser
+package darthorimar.todolist.parser
 
 import fastparse.all._
-import darthorimar.ast._
+import darthorimar.todolist.ast._
 import fastparse.{all, core}
 
 class ItemParser(indent: Int) {

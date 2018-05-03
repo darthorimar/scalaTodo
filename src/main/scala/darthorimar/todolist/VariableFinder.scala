@@ -1,6 +1,6 @@
-package darthorimar
+package darthorimar.todolist
 
-import darthorimar.ast._
+import darthorimar.todolist.ast._
 
 object VariableFinder {
   private def getVariables(tree: AST)(implicit ignore: Seq[String] = Seq.empty): Seq[String] = tree match {
