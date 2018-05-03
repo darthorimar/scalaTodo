@@ -16,7 +16,7 @@ object Application extends App {
       .action((x, c) =>
         c.copy(displayMode = DisplayMode.fromString(x))).text("Application mode")
       .validate(x =>
-        if (x == ConsoleDisplayMode.name) success
+        if (x == ConsoleDisplayMode.name || x == WebDisplayMode.name) success
         else failure("Value mode must be either 'web' or 'console'")
       )
 

@@ -3,7 +3,7 @@ package darthorimar.todolist
 import java.io.File
 
 import darthorimar.todolist.parser.{ConfigParser, ItemParser}
-import darthorimar.todolist.render.{ConsoleRender, Render, RenderConfig}
+import darthorimar.todolist.render.{ConsoleRender, Render, RenderConfig, WebRender}
 import darthorimar.todolist.runner.{ConsoleRunner, Runner}
 
 import scala.io.Source
@@ -57,10 +57,12 @@ class Frontend(config: AppConfig) {
 
   private val runner: Runner = displayMode match {
     case ConsoleDisplayMode => new ConsoleRunner
+    case WebDisplayMode     => new ConsoleRunner
   }
 
   private val render: Render = displayMode match {
     case ConsoleDisplayMode => new ConsoleRender
+    case WebDisplayMode     => new WebRender
   }
 
 

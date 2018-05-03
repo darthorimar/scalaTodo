@@ -9,11 +9,16 @@ sealed trait DisplayMode {
 object DisplayMode {
   def fromString(name: String): DisplayMode = name match {
     case ConsoleDisplayMode.name => ConsoleDisplayMode
+    case WebDisplayMode.name     => WebDisplayMode
   }
 }
 
 object ConsoleDisplayMode extends DisplayMode {
   override val name: String = "console"
+}
+
+object WebDisplayMode extends DisplayMode {
+  override val name: String = "web"
 }
 
 case class AppConfig(templateFile: File,
