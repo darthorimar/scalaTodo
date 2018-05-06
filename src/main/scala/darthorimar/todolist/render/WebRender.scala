@@ -17,22 +17,23 @@ class WebRender extends Render {
        |${escapeText(content)}
        |</div>""".stripMargin
 
-  override def display(astMarker: AST, content: Seq[String], indent: Int): String = astMarker match {
-    case Template(title, _, _) =>
-      s"""<h1 class="text-center">$title</h1>
-         |<div class="list-group list-group-root well">
-         |${content.head}
-         |</div>""".stripMargin
+  override private[render] def display(astMarker: AST, content: Seq[String], indent: Int): String =
+    astMarker match {
+      case Template(title, _, _) =>
+        s"""<h1 class="text-center">$title</h1>
+           |<div class="list-group list-group-root well">
+           |${content.head}
+           |</div>""".stripMargin
 
-    case SimpleItem(_, is) if is.isEmpty =>
-      renderItem(content.head)
+      case SimpleItem(_, is) if is.isEmpty =>
+        renderItem(content.head)
 
-    case _: SimpleItem =>
-      s"""${renderItem(content.head)}
-         |<div class="list-group">
-         |${content(1)}
-         |</div>""".stripMargin
-  }
+      case _: SimpleItem =>
+        s"""${renderItem(content.head)}
+           |<div class="list-group">
+           |${content(1)}
+           |</div>""".stripMargin
+    }
 }
 
 

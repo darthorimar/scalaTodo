@@ -68,7 +68,7 @@ class ItemParser(indent: Int) {
     P("#" ~ CharsWhile('\n'!=).! ~ "\n")
   private val template: P[Template] =
     P(title.? ~ (definitions ~ lineSep).? ~ item.rep(sep = lineSep) ~ End).map { case (t, defs, items) =>
-      Template(t.getOrElse("Todo"), defs.toSeq.flatten, items)
+      Template(t.getOrElse("").trim, defs.toSeq.flatten, items)
     }
 
   val parser: all.P[Template] = template

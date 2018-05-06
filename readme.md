@@ -1,6 +1,6 @@
 # Todo list in Scala
 
-Allows you to create todo lists in customizable templates and the use them in web browser or terminal
+Allows you to create todo lists in customizable templates and use them in web browser or terminal
 
 ## Syntax:
 * nested todo items:
@@ -69,7 +69,7 @@ To customize a template just create a `.conf` file like the following
 ```
 x=5
 y="nya!"
-cake="false"
+cake=false
 primes=Seq(2,3,5,7,11)
 ```
 
@@ -139,7 +139,6 @@ Example files are `./ricksWeek.templ` and `./ricksWeek.conf`
 ## Command line Usage
 ```
 Usage: todo.jar [options]
-
   -t, --template <file>     Template File
   -m, --mode <web|console>  Application mode
   -c, --config <file>       Config file (optional)

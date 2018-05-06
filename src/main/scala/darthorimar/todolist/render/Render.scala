@@ -5,7 +5,7 @@ import darthorimar.todolist.ast._
 import darthorimar.todolist.render.Render.{State, evalExpr}
 
 trait Render {
-  def display(astMarket: AST, content: Seq[String], indent: Int): String
+  private[render] def display(astMarket: AST, content: Seq[String], indent: Int): String
 
   def render(template: Template, renderConf: RenderConfig): Result[String] =
     renderAst(template)(State.empty, renderConf)

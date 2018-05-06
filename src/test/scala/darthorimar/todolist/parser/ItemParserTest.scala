@@ -18,7 +18,7 @@ object ItemParserTest extends TestSuite with ParserTestMixin {
           | h
           |i""".stripMargin
       val expected =
-        Template(List(),
+        Template("",List(),
           ArrayBuffer(
             SimpleItem(
               ArrayBuffer(
@@ -56,7 +56,7 @@ object ItemParserTest extends TestSuite with ParserTestMixin {
           | %{3}
           |  %{1+2}""".stripMargin
       val expected =
-        Template(List(),
+        Template("",List(),
           ArrayBuffer(
             SimpleItem(
               ArrayBuffer(
@@ -86,7 +86,7 @@ object ItemParserTest extends TestSuite with ParserTestMixin {
           |%else
           | 0""".stripMargin
       val expected =
-        Template(List(),
+        Template("",List(),
           ArrayBuffer(
             IfItem(
               BinOp("or",
@@ -116,7 +116,7 @@ object ItemParserTest extends TestSuite with ParserTestMixin {
           |%else
           | 0""".stripMargin
       val expected =
-        Template(List(),
+        Template("",List(),
           ArrayBuffer(
             IfItem(
               BoolConst(true),
@@ -151,7 +151,7 @@ object ItemParserTest extends TestSuite with ParserTestMixin {
           | nya
           |%def d %{1} %{2}""".stripMargin
       val expected =
-        Template(
+        Template("",
           List(
             DefItem("d",
               ArrayBuffer("a", "b"),
@@ -174,7 +174,7 @@ object ItemParserTest extends TestSuite with ParserTestMixin {
         """%loop i <- range(10)
           | nya""".stripMargin
       val expected =
-        Template(
+        Template("",
           List(),
           ArrayBuffer(
             LoopItem(
